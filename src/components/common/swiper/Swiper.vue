@@ -23,21 +23,22 @@ export default {
       currentIndex: 0,
       slideCount: 0,
       startX: 0,
-      endPoint: 0,
       totalWidth: 0,
       bannerImgBoxStyle: {},
       distance: 0,
-      swiperTimer: ''
+      animToggle: false,
+      intervalToggle: false,
+      options: ''
     }
   },
   props: {
     interval: {
-      type: Number,
-      default: 3000
+      type: String,
+      default: '3000'
     },
     animDuration: {
-      type: Number,
-      default: 300
+      type: String,
+      default: '3'
     },
     moveRatio: {
       type: Number,
@@ -52,9 +53,11 @@ export default {
     setTimeout(() => {
       //  操作DOM元素
       this.handleDom()
+      //  是否开启动画
+      this.startAnimation()
       //  启动定时器 让轮播图动起来
       this.startTimer()
-    }, 2000)
+    }, 3000)
   },
   methods: {
     //  刚触摸到屏幕时的操作
@@ -62,7 +65,9 @@ export default {
       //  记录起始触摸位置距页面左边距离
       this.startX = event.touches[0].pageX
       //  暂停定时器
-      this.stopTiemr()
+      this.stopTimer()
+      //  暂停动画
+      this.stopAnimation()
     },
     //  拖动时进行的操作
     touchMove (event) {
@@ -74,10 +79,14 @@ export default {
       this.setTransform(moveDistance)
     },
     //  停止触摸屏幕时的操作
-    touchEnd (event) {
+    touchEnd () {
       this.checkPosition()
       //  移动完成开启定时器
       this.startTimer()
+      //  开启半动画
+      this.halfAnimal()
+      //  开启动画
+      this.startAnimation()
     },
     //  校验定位
     checkPosition () {
@@ -92,26 +101,55 @@ export default {
         if (this.distance > 0) {
           //  当向右滑动到头时自动从头开始
           if (this.currentIndex >= this.slideCount - 1) {
+            this.setTransform(this.totalWidth * this.slideCount)
             this.currentIndex = 0
           } else {
             this.currentIndex++
+            this.setTransform(this.totalWidth * this.currentIndex)
           }
-          this.setTransform(this.totalWidth * this.currentIndex)
         } else if (this.distance < 0) {
-          //  当滑动到头时自动从头开始
+          // 当滑动到头时自动从头开始
           if (this.currentIndex <= 0) {
+            this.setTransform(-this.totalWidth)
             this.currentIndex = this.slideCount - 1
           } else {
             this.currentIndex--
+            this.setTransform(this.totalWidth * this.currentIndex)
           }
-          this.setTransform(this.totalWidth * this.currentIndex)
         }
       }
     },
     //  变换样式函数
     setTransform (option) {
+      if (this.animToggle) {
+        this.bannerImgBoxStyle = {
+          transform: `translateX(${-this.totalWidth - option}px)`,
+          transition: `all ${this.animDuration}s`
+        }
+        return
+      }
       this.bannerImgBoxStyle = {
         transform: `translateX(${-this.totalWidth - option}px)`
+      }
+      this.options = option
+    },
+    //  开启动画
+    startAnimation () {
+      if (this.animDuration === 'false') {
+        this.animToggle = false
+      } else {
+        this.animToggle = true
+      }
+    },
+    //  暂停动画
+    stopAnimation () {
+      this.animToggle = false
+    },
+    //  释放触摸半动画
+    halfAnimal () {
+      this.bannerImgBoxStyle = {
+        transform: `translateX(${-this.totalWidth - this.options}px)`,
+        transition: '300ms'
       }
     },
     //  操作DOM元素
@@ -132,28 +170,35 @@ export default {
         //  在第一个元素之前添加最后数据中的最后一个元素
         far.insertBefore(lastNode, slideArr[0])
         //  控制显示理论上的第一张图片
-        this.bannerImgBoxStyle = {
-          left: `-${this.totalWidth}px`
-        }
+        this.setTransform(0)
       }
-    },
-    //  定时器轮播函数
-    timerGo () {
-      //  当向右滑动到头时自动从头开始
-      if (this.currentIndex >= this.slideCount - 1) {
-        this.currentIndex = 0
-      } else {
-        this.currentIndex++
-      }
-      this.setTransform(this.totalWidth * this.currentIndex)
     },
     //  启动定时器函数
     startTimer () {
-      this.swiperTimer = setInterval(this.timerGo, 5000)
+      if (this.interval === 'false') return
+      this.swiperTimer = setInterval(this.timerGo, this.interval)
     },
-    //  移除定时器
-    stopTiemr () {
+    //  暂停定时器
+    stopTimer () {
       window.clearInterval(this.swiperTimer)
+    },
+    //  启动定时器后自动滚动函数
+    timerGo () {
+      this.currentIndex++
+      this.setTransform(this.totalWidth * this.currentIndex)
+      //  自动滚动时 边缘处理
+      this.borderHandle()
+    },
+    //  边缘处理函数
+    borderHandle () {
+      if (this.currentIndex > this.slideCount - 1) {
+        this.currentIndex = 0
+        this.stopAnimation()
+        setTimeout(() => {
+          this.setTransform(0)
+          this.startAnimation()
+        }, this.interval / 2)
+      }
     }
   }
 }
@@ -168,8 +213,6 @@ export default {
 
     .banner_img_box {
       display: flex;
-      position: relative;
-      /*transition: all 1s;*/
     }
 
     .banner_indicator {

@@ -1,7 +1,11 @@
 <template>
   <div class="swiper">
     <!--  定义轮播图图片插槽  -->
-    <div class="banner_img_box" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd" :style="bannerImgBoxStyle">
+    <div class="banner_img_box"
+         @touchstart="touchStart"
+         @touchmove="touchMove"
+         @touchend="touchEnd"
+         :style="bannerImgBoxStyle">
       <slot></slot>
     </div>
     <!--  轮播图控制器 -->
@@ -124,9 +128,12 @@ export default {
       if (this.animToggle) {
         this.bannerImgBoxStyle = {
           transform: `translateX(${-this.totalWidth - option}px)`,
+          '-webkit-transform': `translateX(${-this.totalWidth - option}px)`,
+          '-ms-transform': `translateX(${-this.totalWidth - option}px)`,
           transition: `all ${this.animDuration}s`
         }
-        return
+        console.log('全动画执行')
+        return false
       }
       this.bannerImgBoxStyle = {
         transform: `translateX(${-this.totalWidth - option}px)`
@@ -151,6 +158,7 @@ export default {
         transform: `translateX(${-this.totalWidth - this.options}px)`,
         transition: '300ms'
       }
+      console.log('半动画执行')
     },
     //  操作DOM元素
     handleDom () {
@@ -175,8 +183,8 @@ export default {
     },
     //  启动定时器函数
     startTimer () {
-      if (this.interval === 'false') return
-      this.swiperTimer = setInterval(this.timerGo, this.interval)
+      if (this.interval === 'false') return false
+      this.swiperTimer = window.setInterval(this.timerGo, this.interval)
     },
     //  暂停定时器
     stopTimer () {

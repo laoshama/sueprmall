@@ -2,21 +2,14 @@
   <div class="home_swiper">
     <swiper :count="banners.length" :showIndicator="true" animDuration="1" interval="3000">
       <swiper-item v-for="(item, index) in banners" :key="index" >
-        <img :src="item.image">
+        <a class="banner_link" :href="item.link"><img :src="item.image"></a>
       </swiper-item>
     </swiper>
-    <ul id="asd">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
   </div>
 </template>
 
 <script>
-import Swiper from 'components/common/swiper/Swiper'
-import SwiperItem from 'components/common/swiper/SwiperItem'
+import { Swiper, SwiperItem } from 'components/common/swiper'
 export default {
   name: 'HomeSwiper',
   props: {
@@ -27,13 +20,12 @@ export default {
   components: {
     Swiper,
     SwiperItem
-  },
-  methods: {
-
   }
 }
 </script>
 
 <style scoped>
-
+  .banner_link {
+    display: block;
+  }
 </style>

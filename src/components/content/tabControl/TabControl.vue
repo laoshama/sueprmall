@@ -29,6 +29,7 @@ export default {
   methods: {
     turnToRed (index) {
       this.currentIndex = index
+      this.$emit('tabClick', index)
     }
   }
 }

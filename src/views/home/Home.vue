@@ -1,11 +1,14 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommend-view :recommends="recommends"/>
-    <feature-view/>
-    <tab-control class="tab-control"  @tabClick="tabClick" :titles="['流行','新款','精选']"/>
-    <goods-list :goods="showGoods"/>
+    <scroll class="content" ref="scroll" :probe-type="0" @scrollListen="scrollListen">
+      <home-swiper :banners="banners"></home-swiper>
+      <recommend-view :recommends="recommends"/>
+      <feature-view/>
+      <tab-control class="tab-control"  @tabClick="tabClick" :titles="['流行','新款','精选']"/>
+      <goods-list :goods="showGoods"/>
+    </scroll>
+    <back-top @click.native="backTop" v-show="isShow_backTop"/>
   </div>
 </template>
 
@@ -13,11 +16,13 @@
 import { getHomeMultidata, getHomeGoods } from 'network/home'
 
 import NavBar from 'components/common/navigationbar/NavBar'
-import TabControl from 'components/content/tabControl/TabControl'
 import HomeSwiper from './childComps/HomeSwiper'
 import RecommendView from './childComps/RecommendView'
 import FeatureView from './childComps/FeatureView'
+import TabControl from 'components/content/tabControl/TabControl'
 import GoodsList from 'components/content/goods/GoodsList'
+import Scroll from 'components/common/scroll/Scroll'
+import backTop from 'components/content/backtop/backTop'
 
 export default {
   name: 'Home',
@@ -30,16 +35,19 @@ export default {
         new: { page: 0, list: [] },
         sell: { page: 0, list: [] }
       },
-      currentType: 'pop'
+      currentType: 'pop',
+      isShow_backTop: false
     }
   },
   components: {
     NavBar,
-    TabControl,
     HomeSwiper,
     RecommendView,
     FeatureView,
-    GoodsList
+    TabControl,
+    GoodsList,
+    Scroll,
+    backTop
   },
   created () {
     // 1、请求轮播图和推荐数据
@@ -71,6 +79,18 @@ export default {
           break
       }
     },
+    backTop () {
+      this.$refs.scroll.scrollTo(0, 0, 2000)
+      console.log(this.$refs.scroll)
+    },
+    scrollListen (position) {
+      if (position.y < -1500) {
+        this.isShow_backTop = true
+      } else {
+        this.isShow_backTop = false
+      }
+    },
+
     /*
        网络请求
     */
@@ -95,6 +115,7 @@ export default {
 <style lang="less" scoped>
   #home {
     padding-top: 44px;
+    height: 100vh;
 
     .home-nav {
       background-color: var(--color-tint);
@@ -105,8 +126,12 @@ export default {
       top: 0;
       z-index: 10;
     }
+
+    .content{
+      height: calc(100% - 49px);
+      overflow: hidden;
+    }
     .tab-control {
-      position: sticky;
       top: 44px;
       background-color: #fff;
     }

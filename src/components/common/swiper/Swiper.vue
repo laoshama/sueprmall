@@ -146,7 +146,6 @@ export default {
           '-ms-transform': `translateX(${-this.totalWidth - option}px)`,
           transition: `all ${this.animDuration}s`
         }
-        console.log('全动画执行')
         return false
       }
       this.bannerImgBoxStyle = {
@@ -172,7 +171,6 @@ export default {
         transform: `translateX(${-this.totalWidth - this.options}px)`,
         transition: '300ms'
       }
-      console.log('半动画执行')
     },
     //  操作DOM元素
     handleDom () {

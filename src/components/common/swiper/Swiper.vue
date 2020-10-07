@@ -32,7 +32,8 @@ export default {
       distance: 0,
       animToggle: false,
       intervalToggle: false,
-      options: ''
+      options: '',
+      isScrolling: true
     }
   },
   props: {
@@ -61,7 +62,7 @@ export default {
       this.startAnimation()
       //  启动定时器 让轮播图动起来
       this.startTimer()
-    }, 3000)
+    }, 1000)
   },
   methods: {
     //  刚触摸到屏幕时的操作
@@ -107,6 +108,11 @@ export default {
           if (this.currentIndex >= this.slideCount - 1) {
             this.setTransform(this.totalWidth * this.slideCount)
             this.currentIndex = 0
+            setTimeout(() => {
+              this.stopAnimation()
+              this.setTransform(0)
+              this.startAnimation()
+            }, 500)
           } else {
             this.currentIndex++
             this.setTransform(this.totalWidth * this.currentIndex)
@@ -125,6 +131,7 @@ export default {
     },
     //  变换样式函数
     setTransform (option) {
+      this.isScrolling = false
       if (this.animToggle) {
         this.bannerImgBoxStyle = {
           transform: `translateX(${-this.totalWidth - option}px)`,

@@ -108,6 +108,7 @@ export default {
           if (this.currentIndex >= this.slideCount - 1) {
             this.setTransform(this.totalWidth * this.slideCount)
             this.currentIndex = 0
+            //  若滑到克隆出来的最后一页时，定位到图片真实存在的第一页
             setTimeout(() => {
               this.stopAnimation()
               this.setTransform(0)
@@ -122,6 +123,12 @@ export default {
           if (this.currentIndex <= 0) {
             this.setTransform(-this.totalWidth)
             this.currentIndex = this.slideCount - 1
+            //  若滑到克隆出来的第一页时，定位到图片真实存在的最后一页
+            setTimeout(() => {
+              this.stopAnimation()
+              this.setTransform(this.totalWidth * (this.slideCount - 1))
+              this.startAnimation()
+            }, 500)
           } else {
             this.currentIndex--
             this.setTransform(this.totalWidth * this.currentIndex)

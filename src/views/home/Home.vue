@@ -1,15 +1,24 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-control ref="tabcontrol"
+                 class="tab-control"
+                 v-show="isTabFixed"
+                 @tabClick="tabClick"
+                 :titles="['流行','新款','精选']"/>
     <scroll class="content"
             ref="scroll"
-            :probe-type="0"
+            :probe-type="3"
             @scrollListen="scrollListen"
             @pullingUpListen="loadMore">
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @SwiperImageLoad="SwiperImageLoad"></home-swiper>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control class="tab-control"  @tabClick="tabClick" :titles="['流行','新款','精选']"/>
+      <tab-control ref="tabcontrol"
+                   v-show="!isTabFixed"
+                   :class="{Fixed: isTabFixed}"
+                   @tabClick="tabClick"
+                   :titles="['流行','新款','精选']"/>
       <goods-list :goods="showGoods"/>
     </scroll>
     <back-top @click.native="backTop" v-show="isShow_backTop"/>
@@ -46,9 +55,9 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: 'pop',
-      isShow_backTop: false
-      // firstHomeContentHeight: 0,
-      // contentDom: null
+      isShow_backTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false
     }
   },
 
@@ -97,18 +106,21 @@ export default {
     backTop () {
       this.$refs.scroll.scrollTo(0, 0, 2000)
     },
-    scrollListen (position, contentDom) {
-      if (position.y < -1500) {
-        this.isShow_backTop = true
-      } else {
-        this.isShow_backTop = false
-      }
+    scrollListen (position) {
+      //  1、判断BackTop是否显示
+      this.isShow_backTop = position.y < -1500
+      //  2、决定tabControl是否吸顶
+      this.isTabFixed = -position.y > this.tabOffsetTop - 44
     },
     loadMore () {
       this.getHomeGoods(this.currentType)
       setTimeout(() => {
         this.$refs.scroll.finishPullUp()
-      }, 2000)
+      }, 1000)
+    },
+    // 监听banners中的图片加载完成后的操作
+    SwiperImageLoad () {
+      this.tabOffsetTop = this.$refs.tabcontrol.$el.offsetTop
     },
 
     /*
@@ -128,12 +140,19 @@ export default {
         this.goods[type].page++
       })
     }
+
+    /*  让tabControl定位 */
+    // positionTabControl () {
+    //   this.tabControl.style = {
+    //     backgroundColor: 'red'
+    //   }
+    // }
   },
   mounted () {
-    // 通过事件总线监听item中图片加载完成
+    //  对refresh进行防抖处理
     let reCalculate = null
     if (!this.$refs.scroll.bs) {
-      //  alert('scroll实例未初始化完成')
+      //  防止scroll实例未初始化完成
       setTimeout(() => {
         reCalculate = debounce(this.$refs.scroll.reCalculate, 500)
       }, 2000)
@@ -141,6 +160,7 @@ export default {
       reCalculate = debounce(this.$refs.scroll.reCalculate, 500)
     }
 
+    // 通过事件总线监听item中图片加载完成
     this.$bus.$on('itemImageLoad', () => {
       reCalculate()
     })
@@ -150,26 +170,40 @@ export default {
 
 <style lang="less" scoped>
   #home {
-    padding-top: 44px;
+    position: relative;
+    /*padding-top: 44px;*/
     height: 100vh;
 
     .home-nav {
       background-color: var(--color-tint);
       color: #fff;
-      position: fixed;
-      left: 0;
-      right: 0;
-      top: 0;
-      z-index: 10;
+      /*position: fixed;*/
+      /*left: 0;*/
+      /*right: 0;*/
+      /*top: 0;*/
+      /*z-index: 10;*/
     }
 
     .content{
-      height: calc(100% - 49px);
+      height: calc(100% - 93px);
       overflow: hidden;
+
+      /*position: absolute;*/
+      /*top: 44px;*/
+      /*bottom: 49px;*/
+      /*right: 0;*/
+      /*left: 0;*/
     }
-    .tab-control {
-      top: 44px;
+
+    .Fixed {
+      position: fixed;
+      top: 0;
       background-color: #fff;
+    }
+
+    .tab-control {
+      position: relative;
+      z-index: 9;
     }
   }
 

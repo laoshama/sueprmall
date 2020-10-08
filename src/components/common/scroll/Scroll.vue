@@ -48,7 +48,6 @@ export default {
     //  重新计算ScrollHeight
     reCalculate () {
       this.bs && this.bs.refresh && this.bs.refresh()
-      console.log('----')
     },
 
     //  上拉加载完成
@@ -58,22 +57,26 @@ export default {
   },
 
   mounted () {
-    //  创建BScroll实例
+    //  1、创建BScroll实例
     this.bs = new BScroll(this.$refs.wrapper, {
       probeType: this.probeType,
       click: this.click,
       pullUpLoad: this.pullUpLoad
     })
 
-    //  监听滚动事件
-    this.bs.on('scroll', (position) => {
-      this.$emit('scrollListen', position)
-    })
+    //  2、监听滚动事件
+    if (this.probeType === 2 || this.probeType === 3) {
+      this.bs.on('scroll', (position) => {
+        this.$emit('scrollListen', position)
+      })
+    }
 
-    //  监听上拉事件
-    this.bs.on('pullingUp', () => {
-      this.$emit('pullingUpListen')
-    })
+    //  3、监听滚动到底部后上拉事件
+    if (this.pullUpLoad) {
+      this.bs.on('pullingUp', () => {
+        this.$emit('pullingUpListen')
+      })
+    }
   }
 }
 </script>

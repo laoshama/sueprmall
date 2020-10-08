@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <tab-control ref="tabcontrol"
+    <tab-control ref="tabcontrol1"
                  class="tab-control"
                  v-show="isTabFixed"
                  @tabClick="tabClick"
@@ -14,7 +14,7 @@
       <home-swiper :banners="banners" @SwiperImageLoad="SwiperImageLoad"></home-swiper>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control ref="tabcontrol"
+      <tab-control ref="tabcontrol2"
                    v-show="!isTabFixed"
                    :class="{Fixed: isTabFixed}"
                    @tabClick="tabClick"
@@ -91,6 +91,7 @@ export default {
        事件监听相关的方法
     */
     tabClick (index) {
+      //  1、根据子组件传来的currentType决定显示的数据
       switch (index) {
         case 0:
           this.currentType = 'pop'
@@ -102,6 +103,10 @@ export default {
           this.currentType = 'sell'
           break
       }
+
+      //  2、让两个tabContro进行数据同步
+      this.$refs.tabcontrol1.currentIndex = index
+      this.$refs.tabcontrol2.currentIndex = index
     },
     backTop () {
       this.$refs.scroll.scrollTo(0, 0, 2000)
@@ -120,7 +125,7 @@ export default {
     },
     // 监听banners中的图片加载完成后的操作
     SwiperImageLoad () {
-      this.tabOffsetTop = this.$refs.tabcontrol.$el.offsetTop
+      this.tabOffsetTop = this.$refs.tabcontrol2.$el.offsetTop
     },
 
     /*
@@ -140,13 +145,6 @@ export default {
         this.goods[type].page++
       })
     }
-
-    /*  让tabControl定位 */
-    // positionTabControl () {
-    //   this.tabControl.style = {
-    //     backgroundColor: 'red'
-    //   }
-    // }
   },
   mounted () {
     //  对refresh进行防抖处理

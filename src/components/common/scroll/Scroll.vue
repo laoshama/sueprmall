@@ -53,6 +53,11 @@ export default {
     //  上拉加载完成
     finishPullUp () {
       this.bs && this.bs.finishPullUp()
+    },
+
+    //  获取当前滚动位置的Y的值
+    getScrollY () {
+      return this.bs ? this.bs.y : 0
     }
   },
 

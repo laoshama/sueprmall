@@ -57,7 +57,8 @@ export default {
       currentType: 'pop',
       isShow_backTop: false,
       tabOffsetTop: 0,
-      isTabFixed: false
+      isTabFixed: false,
+      saveY: 0
     }
   },
 
@@ -162,6 +163,13 @@ export default {
     this.$bus.$on('itemImageLoad', () => {
       reCalculate()
     })
+  },
+  activated () {
+    this.$refs.scroll.scrollTo(0, this.saveY, 0)
+    this.$refs.scroll.reCalculate()
+  },
+  deactivated () {
+    this.saveY = this.$refs.scroll.getScrollY()
   }
 }
 </script>

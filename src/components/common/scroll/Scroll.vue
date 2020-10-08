@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper" ref="wrapper">
-    <div class="content">
+    <div class="contentSum">
       <slot></slot>
     </div>
   </div>
@@ -16,11 +16,14 @@ BScroll.use(PullUp)
 
 export default {
   name: 'Scroll',
+
   data () {
     return {
       bs: null
+      // cont: null
     }
   },
+
   props: {
     probeType: {
       type: Number,
@@ -35,37 +38,46 @@ export default {
       default: true
     }
   },
+
+  methods: {
+    //  滚动到指定位置
+    scrollTo (x, y, time = 300) {
+      this.bs && this.bs.scrollTo && this.bs.scrollTo(x, y, time)
+    },
+
+    //  重新计算ScrollHeight
+    reCalculate () {
+      this.bs && this.bs.refresh && this.bs.refresh()
+      console.log('----')
+    },
+
+    //  上拉加载完成
+    finishPullUp () {
+      this.bs && this.bs.finishPullUp()
+    }
+  },
+
   mounted () {
+    //  创建BScroll实例
     this.bs = new BScroll(this.$refs.wrapper, {
       probeType: this.probeType,
       click: this.click,
       pullUpLoad: this.pullUpLoad
     })
 
+    //  监听滚动事件
     this.bs.on('scroll', (position) => {
       this.$emit('scrollListen', position)
     })
 
+    //  监听上拉事件
     this.bs.on('pullingUp', () => {
-      //  上拉事件执行完成
-      setTimeout(() => {
-        this.bs.finishPullUp()
-      }, 2000)
+      this.$emit('pullingUpListen')
     })
-
-    // 重新计算长度，因为加载图片时可能没有能完全加载进来，
-    // 所以需要重新计算元素长度
-    setTimeout(() => {
-      this.bs.refresh()
-    }, 1000)
-  },
-  methods: {
-    scrollTo (x, y, time = 300) {
-      this.bs.scrollTo(x, y, time)
-    }
   }
 }
 </script>
 
 <style scoped>
+
 </style>

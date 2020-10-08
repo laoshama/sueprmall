@@ -1,7 +1,11 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <scroll class="content" ref="scroll" :probe-type="0" @scrollListen="scrollListen">
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="0"
+            @scrollListen="scrollListen"
+            @pullingUpListen="loadMore">
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -13,8 +17,13 @@
 </template>
 
 <script>
+/*  网络请求文件导入  */
 import { getHomeMultidata, getHomeGoods } from 'network/home'
 
+/*  功能函数导入  */
+import { debounce } from 'common/utils'
+
+/*  组件导入  */
 import NavBar from 'components/common/navigationbar/NavBar'
 import HomeSwiper from './childComps/HomeSwiper'
 import RecommendView from './childComps/RecommendView'
@@ -26,6 +35,7 @@ import backTop from 'components/content/backtop/backTop'
 
 export default {
   name: 'Home',
+
   data () {
     return {
       banners: [],
@@ -37,8 +47,11 @@ export default {
       },
       currentType: 'pop',
       isShow_backTop: false
+      // firstHomeContentHeight: 0,
+      // contentDom: null
     }
   },
+
   components: {
     NavBar,
     HomeSwiper,
@@ -49,9 +62,11 @@ export default {
     Scroll,
     backTop
   },
+
   created () {
     // 1、请求轮播图和推荐数据
     this.getHomeMultidata()
+
     // 2、请求商品数据
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
@@ -81,14 +96,19 @@ export default {
     },
     backTop () {
       this.$refs.scroll.scrollTo(0, 0, 2000)
-      console.log(this.$refs.scroll)
     },
-    scrollListen (position) {
+    scrollListen (position, contentDom) {
       if (position.y < -1500) {
         this.isShow_backTop = true
       } else {
         this.isShow_backTop = false
       }
+    },
+    loadMore () {
+      this.getHomeGoods(this.currentType)
+      setTimeout(() => {
+        this.$refs.scroll.finishPullUp()
+      }, 2000)
     },
 
     /*
@@ -108,6 +128,22 @@ export default {
         this.goods[type].page++
       })
     }
+  },
+  mounted () {
+    // 通过事件总线监听item中图片加载完成
+    let reCalculate = null
+    if (!this.$refs.scroll.bs) {
+      //  alert('scroll实例未初始化完成')
+      setTimeout(() => {
+        reCalculate = debounce(this.$refs.scroll.reCalculate, 500)
+      }, 2000)
+    } else {
+      reCalculate = debounce(this.$refs.scroll.reCalculate, 500)
+    }
+
+    this.$bus.$on('itemImageLoad', () => {
+      reCalculate()
+    })
   }
 }
 </script>

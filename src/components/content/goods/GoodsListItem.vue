@@ -1,6 +1,6 @@
 <template>
   <div class="good_list_item">
-    <a :href="goodsItem.link"><img :src="goodsItem.show.img" alt=""></a>
+    <a :href="goodsItem.link"><img :src="goodsItem.show.img" alt="" @load="imageLoad"></a>
     <div class="description">
       <div class="title">{{ goodsItem.title }}</div>
       <span class="price">{{ goodsItem.price }}</span>
@@ -18,6 +18,14 @@ export default {
       default () {
         return {}
       }
+    }
+  },
+  methods: {
+    //  Vue中通过@load监听图片加载完成事件
+    //  原生dom操作，img.onload = function () {....}
+    imageLoad () {
+      // 通过vue实例发射接收事件
+      this.$bus.$emit('itemImageLoad')
     }
   }
 }

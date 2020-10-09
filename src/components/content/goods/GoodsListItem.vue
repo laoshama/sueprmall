@@ -1,6 +1,6 @@
 <template>
-  <div class="good_list_item">
-    <a :href="goodsItem.link"><img :src="goodsItem.show.img" alt="" @load="imageLoad"></a>
+  <div class="good_list_item" @click="itemClick">
+    <img :src="goodsItem.show.img" alt="" @load="imageLoad">
     <div class="description">
       <div class="title">{{ goodsItem.title }}</div>
       <span class="price">{{ goodsItem.price }}</span>
@@ -26,6 +26,10 @@ export default {
     imageLoad () {
       // 通过vue实例发射接收事件
       this.$bus.$emit('itemImageLoad')
+    },
+
+    itemClick () {
+      this.$router.push('/detail/' + this.goodsItem.iid)
     }
   }
 }

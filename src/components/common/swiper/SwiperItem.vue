@@ -23,9 +23,5 @@ export default {
   .slide {
     width: 100%;
     flex-shrink: 0;
-
-    img{
-      width: 100%;
-    }
   }
 </style>

@@ -3,7 +3,7 @@
     <swiper :count="banners.length" :showIndicator="true" animDuration="1" interval="3000">
       <swiper-item v-for="(item, index) in banners" :key="index" >
         <a class="banner_link" :href="item.link">
-          <img :src="item.image" @load="ImageLoad">
+          <img :src="item.image" @load="ImageLoad" width="375">
         </a>
       </swiper-item>
     </swiper>
@@ -30,6 +30,7 @@ export default {
   },
   methods: {
     ImageLoad () {
+      console.log('图片加载完成')
       if (!this.isLoad) {
         this.$emit('SwiperImageLoad')
         this.isLoad = true

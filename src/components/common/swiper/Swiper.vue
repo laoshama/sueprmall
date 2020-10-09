@@ -2,6 +2,7 @@
   <div class="swiper">
     <!--  定义轮播图图片插槽  -->
     <div class="banner_img_box"
+         ref="wrapper"
          @touchstart="touchStart"
          @touchmove="touchMove"
          @touchend="touchEnd"
@@ -9,11 +10,12 @@
       <slot></slot>
     </div>
     <!--  轮播图控制器 -->
-    <div class="banner_indicator">
+    <div v-if="isNeedIndicator" class="banner_indicator">
       <div class="indicator"
            :class="{ isActive: currentIndex === index }"
            v-for="(item, index) in slideCount"
-           :key="index"></div>
+           :key="index">
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +35,8 @@ export default {
       animToggle: false,
       intervalToggle: false,
       options: '',
-      isScrolling: true
+      isScrolling: true,
+      isNeedIndicator: true
     }
   },
   props: {
@@ -52,21 +55,29 @@ export default {
     showIndicator: {
       type: Boolean,
       default: true
+    },
+    indicator: {
+      type: Boolean,
+      default: true
     }
   },
   mounted: function () {
     setTimeout(() => {
       //  操作DOM元素
       this.handleDom()
+      //  是否显示轮播图控制器
+      this.isIndicator()
       //  是否开启动画
       this.startAnimation()
-      //  启动定时器 让轮播图动起来
+      //  启动定时器(让轮播图动起来)
       this.startTimer()
     }, 1000)
   },
   methods: {
     //  刚触摸到屏幕时的操作
     touchStart (event) {
+      //  只有一张图片时不作为
+      if (this.slideCount <= 1) return
       //  记录起始触摸位置距页面左边距离
       this.startX = event.touches[0].pageX
       //  暂停定时器
@@ -76,6 +87,8 @@ export default {
     },
     //  拖动时进行的操作
     touchMove (event) {
+      //  只有一张图片时不作为
+      if (this.slideCount <= 1) return
       //  计算触摸点移动时动态的pageX
       this.distance = this.startX - event.touches[0].pageX
       //  当前所在位置
@@ -85,6 +98,8 @@ export default {
     },
     //  停止触摸屏幕时的操作
     touchEnd () {
+      //  只有一张图片时不作为
+      if (this.slideCount <= 1) return
       this.checkPosition()
       //  移动完成开启定时器
       this.startTimer()
@@ -174,28 +189,31 @@ export default {
     },
     //  操作DOM元素
     handleDom () {
+      //  获取父节点banner_img_box
+      const far = this.$refs.wrapper
       // 指定指示器显示个数
-      const slideArr = document.getElementsByClassName('slide')
-      this.slideCount = slideArr.length
-      this.totalWidth = slideArr[0].offsetWidth
+      this.slideCount = far.children.length
+      this.totalWidth = far.offsetWidth
 
       //  如果总图大于1，则在第一个元素之前添加最后一个元素
       if (this.slideCount > 1) {
-        //  获取父节点banner_img_box
-        const far = document.querySelector('.banner_img_box')
-        const lastNode = slideArr[this.slideCount - 1].cloneNode(true)
-        const firstchild = slideArr[0].cloneNode(true)
+        const lastNode = far.lastChild.cloneNode(true)
+        const firstchild = far.firstChild.cloneNode(true)
         //  在末尾加上一个数据中的第一个元素
         far.appendChild(firstchild)
         //  在第一个元素之前添加最后数据中的最后一个元素
-        far.insertBefore(lastNode, slideArr[0])
+        far.insertBefore(lastNode, far.children[0])
         //  控制显示理论上的第一张图片
         this.setTransform(0)
+        console.log('多张图时执行')
       }
+      //  只有一张图则不显示轮播图显示器
+      this.isNeedIndicator = false
     },
     //  启动定时器函数
     startTimer () {
-      if (this.interval === 'false') return false
+      //  不设置启动定时器或者只有一张图时都不启动定时器
+      if (this.interval === 'false' || this.slideCount <= 1) return false
       this.swiperTimer = window.setInterval(this.timerGo, this.interval)
     },
     //  暂停定时器
@@ -219,6 +237,10 @@ export default {
           this.startAnimation()
         }, this.interval / 2)
       }
+    },
+    //  轮播图控制器选择
+    isIndicator () {
+      this.isNeedIndicator = this.indicator
     }
   }
 }

@@ -205,7 +205,6 @@ export default {
         far.insertBefore(lastNode, far.children[0])
         //  控制显示理论上的第一张图片
         this.setTransform(0)
-        console.log('多张图时执行')
       }
       //  只有一张图则不显示轮播图显示器
       this.isNeedIndicator = false

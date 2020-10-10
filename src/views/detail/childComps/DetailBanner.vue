@@ -5,7 +5,7 @@
         class="banner-images"
         v-for="(item, index) in topImages"
         :key="index">
-          <img :src="item" alt="">
+          <img :src="item" alt="" @load="detailBannerImageLoad">
       </SwiperItem>
     </Swiper>
   </div>
@@ -15,6 +15,12 @@
 import { Swiper, SwiperItem } from 'components/common/swiper/index'
 export default {
   name: 'DetailBanner',
+  data () {
+    return {
+      count: 0,
+      imageLength: 0
+    }
+  },
   props: {
     topImages: {
       type: Array,
@@ -26,6 +32,19 @@ export default {
   components: {
     Swiper,
     SwiperItem
+  },
+  methods: {
+    /*  可以在加载多张图片时只发送一次事件 */
+    detailBannerImageLoad () {
+      if (this.count >= this.imageLength) {
+        this.$emit('detailBannerImageLoad')
+      }
+    }
+  },
+  watch: {
+    topImages () {
+      this.imageLength = this.topImages.length
+    }
   }
 }
 </script>

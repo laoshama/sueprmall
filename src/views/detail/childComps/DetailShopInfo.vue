@@ -49,7 +49,8 @@ export default {
 
 <style lang="less" scoped>
   .detail-shop-info {
-    margin: 40px 10px;
+    padding: 40px 10px;
+    box-shadow: 0 2px 5px #ccc;
 
     .shop-name-logo {
       height:60px;

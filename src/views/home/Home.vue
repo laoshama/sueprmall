@@ -40,7 +40,7 @@ import FeatureView from './childComps/FeatureView'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import backTop from 'components/content/backtop/backTop'
+import BackTop from 'components/content/backtop/BackTop'
 
 export default {
   name: 'Home',
@@ -70,7 +70,7 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
-    backTop
+    BackTop
   },
 
   created () {
@@ -110,7 +110,7 @@ export default {
       this.$refs.tabcontrol2.currentIndex = index
     },
     backTop () {
-      this.$refs.scroll.scrollTo(0, 0, 2000)
+      this.$refs.scroll.scrollTo(0, 50, 1000)
     },
     scrollListen (position) {
       //  1、判断BackTop是否显示

@@ -2,80 +2,59 @@
   <div class="goodsDetail">
     <!--  导航栏   -->
     <detail-nav-bar/>
-    <!--  轮播图   -->
-    <detail-banner :topImages="topImages"/>
-    <!--  商品描述信息  -->
-    <detail-base-info :goods="goods"/>
-    <!--  商家描述信息  -->
-    <detail-shop-info :shops="shops"/>
-    <ul>
-      <li>嘀嘀嘀1</li>
-      <li>嘀嘀嘀2</li>
-      <li>嘀嘀嘀3</li>
-      <li>嘀嘀嘀4</li>
-      <li>嘀嘀嘀5</li>
-      <li>嘀嘀嘀6</li>
-      <li>嘀嘀嘀7</li>
-      <li>嘀嘀嘀8</li>
-      <li>嘀嘀嘀9</li>
-      <li>嘀嘀嘀10</li>
-      <li>嘀嘀嘀11</li>
-      <li>嘀嘀嘀12</li>
-      <li>嘀嘀嘀13</li>
-      <li>嘀嘀嘀14</li>
-      <li>嘀嘀嘀15</li>
-      <li>嘀嘀嘀16</li>
-      <li>嘀嘀嘀17</li>
-      <li>嘀嘀嘀18</li>
-      <li>嘀嘀嘀19</li>
-      <li>嘀嘀嘀20</li>
-      <li>嘀嘀嘀21</li>
-      <li>嘀嘀嘀22</li>
-      <li>嘀嘀嘀23</li>
-      <li>嘀嘀嘀24</li>
-      <li>嘀嘀嘀25</li>
-      <li>嘀嘀嘀26</li>
-      <li>嘀嘀嘀27</li>
-      <li>嘀嘀嘀28</li>
-      <li>嘀嘀嘀29</li>
-      <li>嘀嘀嘀30</li>
-      <li>嘀嘀嘀31</li>
-      <li>嘀嘀嘀32</li>
-      <li>嘀嘀嘀33</li>
-      <li>嘀嘀嘀34</li>
-      <li>嘀嘀嘀35</li>
-      <li>嘀嘀嘀36</li>
-      <li>嘀嘀嘀37</li>
-      <li>嘀嘀嘀38</li>
-      <li>嘀嘀嘀39</li>
-      <li>嘀嘀嘀40</li>
-    </ul>
+    <scroll class="detail-scroll"
+            :probeType="3"
+            ref="detailScroll"
+            @scrollListen="scrollListen">
+      <!--  轮播图   -->
+      <detail-banner :topImages="topImages" @detailBannerImageLoad="myRefresh"/>
+      <!--  商品描述信息  -->
+      <detail-base-info :goods="goods"/>
+      <!--  商家描述信息  -->
+      <detail-shop-info :shops="shops"/>
+      <!--  商品详情信息描述  -->
+      <detail-commentInfo :detailInfo="detailInfo" @moreGoodsImageLoad="myRefresh"/>
+    </scroll>
+    <detail-main-tab-bar class="detail-main-tab-bar"/>
+    <back-top v-show="isShow" @click.native="backTopClick"/>
   </div>
 </template>
 
 <script>
 import { getDetail, GoodsInfo, Shop } from 'network/detail'
+import { debounce } from 'common/utils'
 
 import DetailNavBar from './childComps/DetailNavBar'
 import DetailBanner from './childComps/DetailBanner'
 import DetailBaseInfo from './childComps/DetailBaseInfo'
 import DetailShopInfo from './childComps/DetailShopInfo'
+import Scroll from 'components/common/scroll/Scroll'
+import DetailMainTabBar from './childComps/DetailMainTabBar'
+import DetailCommentInfo from './childComps/DetailCommentInfo'
+import BackTop from 'components/content/backtop/BackTop'
 
 export default {
   name: 'GoodsDetail',
   data () {
     return {
       id: null,
+      isShow: false,
+      betterSc: {},
       topImages: [],
       goods: {},
-      shops: {}
+      shops: {},
+      detailInfo: {}
     }
   },
   components: {
     DetailNavBar,
     DetailBanner,
     DetailBaseInfo,
-    DetailShopInfo
+    DetailShopInfo,
+    Scroll,
+    DetailMainTabBar,
+    DetailCommentInfo,
+    BackTop
   },
   created () {
     //  1、保存传入的id
@@ -90,11 +69,53 @@ export default {
       this.goods = new GoodsInfo(datas.itemInfo, datas.columns, datas.shopInfo)
       //  3、获取商家信息
       this.shops = new Shop(datas.shopInfo)
+      //  4、获取商品详情信息
+      this.detailInfo = datas.detailInfo
+      console.log(datas)
     })
+  },
+  methods: {
+    /*  刷新滚动高度函数  */
+    myRefresh () {
+      this.$refs.detailScroll.reCalculate()
+    },
+    refreshScrollHeight () {},
+    /*  监听滚动距离显示返回顶部图标  */
+    scrollListen () {
+      if (-this.betterSc.y >= 1000) {
+        this.isShow = true
+      } else {
+        this.isShow = false
+      }
+    },
+    /*  点击backTop返回顶部 */
+    backTopClick () {
+      this.$refs.detailScroll.scrollTo(0, 50, 1000)
+    }
+  },
+  mounted () {
+    //  1、刷新betterScroll高度防抖封装
+    this.refreshScrollHeight = debounce(this.myRefresh, 500)
+    //  2、获得betterScroll组件的对象
+    this.betterSc = this.$refs.detailScroll.bs
   }
 }
 </script>
 
 <style lang="less" scoped>
+  .goodsDetail {
+    background-color: #ffffff;
+    height: 100vh;
 
+    .detail-scroll {
+      height: calc(100% - 93px);
+    }
+
+    .detail-main-tab-bar {
+      position: relative;
+      z-index: 12;
+      width: 60px;
+      background-color: #f00;
+    }
+  }
 </style>

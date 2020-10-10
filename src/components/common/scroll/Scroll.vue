@@ -20,7 +20,6 @@ export default {
   data () {
     return {
       bs: null
-      // cont: null
     }
   },
 
@@ -37,6 +36,10 @@ export default {
       type: Boolean,
       default: true
     }
+    // positionY: {
+    //   type: String,
+    //   default: '1000'
+    // }
   },
 
   methods: {
@@ -59,6 +62,12 @@ export default {
     getScrollY () {
       return this.bs ? this.bs.y : 0
     }
+    // //  滚动大于传入的数值就会向外发自定义事件
+    // emitMyFn () {
+    //   if (this.bs.y >= this.positionY) {
+    //     this.$emit('overScroll')
+    //   }
+    // }
   },
 
   mounted () {
@@ -74,6 +83,7 @@ export default {
       this.bs.on('scroll', (position) => {
         this.$emit('scrollListen', position)
       })
+      // this.emitMyFn()
     }
 
     //  3、监听滚动到底部后上拉事件
@@ -82,10 +92,13 @@ export default {
         this.$emit('pullingUpListen')
       })
     }
+    //  4、滚动大于传入的数值就会向外发自定义事件
   }
 }
 </script>
 
 <style scoped>
-
+  .wrapper {
+    overflow: hidden;
+  }
 </style>

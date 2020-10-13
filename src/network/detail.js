@@ -33,3 +33,20 @@ export class Shop {
     this.cGoods = shopInfo.cGoods
   }
 }
+
+export class GoodsParam {
+  constructor (info, rule) {
+    this.image = info.images ? info.images : ''
+    this.infos = info.set
+    this.sizes = rule.tables
+    this.disclaimer = rule.disclaimer
+    this.key = rule.key
+  }
+}
+
+export class Rate {
+  constructor (rate) {
+    this.cRate = rate.cRate
+    this.list = rate.list
+  }
+}

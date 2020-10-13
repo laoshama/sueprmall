@@ -61,7 +61,6 @@ export default {
       saveY: 0
     }
   },
-
   components: {
     NavBar,
     HomeSwiper,

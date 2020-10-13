@@ -36,6 +36,7 @@ export default {
     //  控制当前激活titles的颜色
     titleItemClick (index) {
       this.currentIndex = index
+      this.$emit('titleClick', index)
     },
     //  控制返回按钮
     goBackClick () {

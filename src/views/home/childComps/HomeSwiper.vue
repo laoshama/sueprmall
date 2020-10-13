@@ -30,7 +30,6 @@ export default {
   },
   methods: {
     ImageLoad () {
-      console.log('图片加载完成')
       if (!this.isLoad) {
         this.$emit('SwiperImageLoad')
         this.isLoad = true

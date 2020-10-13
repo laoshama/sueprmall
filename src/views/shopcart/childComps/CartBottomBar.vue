@@ -2,7 +2,7 @@
   <div class="cart-bottom-bar">
     <div class="icon-all">
       <div class="icon" @click="pickAllItemClick">
-        <img src="~assets/img/cart/tick.svg" alt="">
+        <img :class="{'all-check': isCheckAll}" src="~assets/img/cart/tick.svg" alt="">
         <span v-show="isCheckAll">全选</span>
         <span v-show="!isCheckAll">取消全选</span>
       </div>
@@ -77,10 +77,14 @@ export default {
   .cart-bottom-bar .icon img {
     position: relative;
     top: 3px;
-    background-color: #ff0000;
     border-radius: 50%;
     width: 20px;
     margin-right: 6px;
+    border: 2px solid #a0a0a0;
+  }
+  .cart-bottom-bar .icon .all-check {
+    background-color: #ff0000;
+    border-color: #ff0000;
   }
   .cart-bottom-bar .go-calculator {
     text-align: center;

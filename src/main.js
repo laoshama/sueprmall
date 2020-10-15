@@ -13,6 +13,9 @@ Vue.prototype.$bus = new Vue()
 Vue.use(toast)
 
 //  解决移动端300ms延迟
+/*
+    使用步骤，npm下载插件，导入插件，挂载到body元素身上
+*/
 FastClick.attach(document.body)
 
 const components = {

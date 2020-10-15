@@ -2,13 +2,12 @@
   <div class="cart-bottom-bar">
     <div class="icon-all">
       <div class="icon" @click="pickAllItemClick">
-        <img :class="{'all-check': isCheckAll}" src="~assets/img/cart/tick.svg" alt="">
-        <span v-show="isCheckAll">全选</span>
-        <span v-show="!isCheckAll">取消全选</span>
+        <img :class="{'all-check': selectLength}" src="~assets/img/cart/tick.svg" alt="">
+        <span>全选</span>
       </div>
       <div class="all">合计:￥{{ allPrice }}</div>
     </div>
-    <div class="go-calculator">去计算({{ allCounts }})</div>
+    <div class="go-calculator" @click="goCal">去计算({{ allCounts }})</div>
   </div>
 </template>
 
@@ -24,34 +23,65 @@ export default {
   computed: {
     ...mapGetters(['cartLength']),
     allPrice () {
-      let allPrice = 0
-      for (const item of this.$store.state.cartList) {
-        if (item.check) {
-          allPrice += item.count * item.realPrice
-        }
-      }
-      return allPrice.toFixed(2)
+      // let allPrice = 0
+      // for (const item of this.$store.state.cartList) {
+      //   if (item.check) {
+      //     allPrice += item.count * item.realPrice
+      //   }
+      // }
+      // return allPrice.toFixed(2)
+      return this.$store.state.cartList.filter((item) => {
+        return item.check
+      }).reduce((preValue, item) => {
+        return preValue + item.count * item.realPrice
+      }, 0).toFixed(2)
     },
     allCounts () {
-      let counts = 0
-      for (const item of this.$store.state.cartList) {
-        if (item.check) {
-          counts += item.count
-        }
-      }
-      return counts
+      // let counts = 0
+      // for (const item of this.$store.state.cartList) {
+      //   if (item.check) {
+      //     counts += item.count
+      //   }
+      // }
+      return this.$store.state.cartList.filter(item => {
+        return item.check
+      }).reduce((preValue, item, index, arr) => {
+        return preValue + item.count
+      }, 0)
+    },
+    selectLength () {
+      if (this.cartLength === 0) return false
+
+      // 方案1
+      // return !(this.$store.state.cartList.filter(item => !item.check).length)
+
+      // 方案2
+      return !(this.$store.state.cartList.find(item => !item.check))
+
+      // 方案3
+      // for (let item of this.this.$store.state.cartList) {
+      //   if (!item.check) {
+      //     return false
+      //   }
+      // }
+      // return true
     }
   },
   methods: {
     //  全选和取消全选按钮
     pickAllItemClick () {
+      if (this.selectLength) {
+        this.isCheckAll = true
+      } else {
+        this.isCheckAll = false
+      }
       this.isCheckAll = !this.isCheckAll
-    }
-  },
-  watch: {
-    isCheckAll () {
-      console.log('修改')
       this.$store.commit('isCheckAll', this.isCheckAll)
+    },
+    //  去计算
+    goCal () {
+      this.$store.state.cartList.find(item => item.check) ? this.$toast.show('计算') : this.$toast.show('请先选择购买商品')
+      this.$toast.show('计算')
     }
   }
 }

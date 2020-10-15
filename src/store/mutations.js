@@ -14,12 +14,17 @@ export default {
   },
   changeCheck (state, item) {
     item.check = !item.check
-    console.log(item.check)
   },
   isCheckAll (state, payload) {
-    for (const item of state.cartList) {
+    // 方案1
+    // for (const item of state.cartList) {
+    //   item.check = payload
+    //   console.log(item)
+    // }
+
+    // 方案2
+    state.cartList.forEach(item => {
       item.check = payload
-      console.log('修改选中状态')
-    }
+    })
   }
 }

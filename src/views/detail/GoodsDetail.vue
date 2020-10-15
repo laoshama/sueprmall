@@ -21,8 +21,9 @@
       <!--  推荐信息  -->
       <detail-recommend ref="recommend"></detail-recommend>
     </scroll>
-    <detail-main-tab-bar class="detail-main-tab-bar" @addCart="addCart"/>
+    <detail-main-tab-bar class="detail-main-tab-bar" @addCart="addToCart"/>
     <back-top v-show="isShow" @click.native="backTopClick"/>
+<!--    <toast :message="message" :show="show" v-show="show"/>-->
   </div>
 </template>
 
@@ -30,6 +31,7 @@
 import { getDetail, GoodsInfo, Shop, GoodsParam, Rate } from 'network/detail'
 import { debounce } from 'common/utils'
 import { itemListenerMixin } from 'common/mixin'
+import { mapActions } from 'vuex'
 
 import DetailNavBar from './childComps/DetailNavBar'
 import DetailBanner from './childComps/DetailBanner'
@@ -42,6 +44,7 @@ import DetailRate from './childComps/DetailRate'
 import DetailRecommend from './childComps/DetailRecommend'
 import BackTop from 'components/content/backtop/BackTop'
 import Scroll from 'components/common/scroll/Scroll'
+// import Toast from 'components/common/toast/Toast'
 
 export default {
   name: 'GoodsDetail',
@@ -59,6 +62,8 @@ export default {
       rates: {},
       themeTopYs: [],
       currentIndex: 0
+      // message: '',
+      // show: false
     }
   },
   components: {
@@ -73,6 +78,7 @@ export default {
     DetailRecommend,
     BackTop,
     Scroll
+    // Toast
   },
   created () {
     //  1、保存传入的id
@@ -96,6 +102,7 @@ export default {
     })
   },
   methods: {
+    ...mapActions(['addCart']),
     /*  刷新滚动高度函数  */
     myRefresh () {
       this.$refs.detailScroll.reCalculate()
@@ -152,7 +159,7 @@ export default {
       this.$refs.detailScroll.scrollTo(0, -this.themeTopYs[index], 1000)
     },
     /*  添加到购物车  */
-    addCart () {
+    addToCart () {
       //  1、获取购物车需要展示的商品信息
       const product = {}
       product.image = this.topImages[0]
@@ -162,7 +169,19 @@ export default {
       product.id = this.id
       product.check = true
       //  2、将商品假如到购物车中
-      this.$store.dispatch('addCart', product)
+      // this.$store.dispatch('addCart', product)
+      //   .then(res => {
+      //     console.log(res, '弹窗')
+      //   })
+      this.addCart(product).then(res => {
+        // this.show = true
+        // this.message = res
+        // setTimeout(() => {
+        //   this.show = false
+        //   this.message = ''
+        // }, 1000)
+        this.$toast.show(res, 1000)
+      })
     }
   },
   mounted () {

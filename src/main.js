@@ -14,7 +14,7 @@ Vue.use(toast)
 
 //  解决移动端300ms延迟
 /*
-    使用步骤，npm下载插件，导入插件，挂载到body元素身上
+    使用步骤，npm下载fastClick库，导入库，添加到body元素身上
 */
 FastClick.attach(document.body)
 
